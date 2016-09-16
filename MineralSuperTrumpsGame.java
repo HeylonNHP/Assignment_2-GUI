@@ -35,18 +35,12 @@ public class MineralSuperTrumpsGame {
         }
     }
     public static void startGame(int players){
-        ArrayList cardList = loadCards("C:\\Users\\Heylon2\\OneDrive\\JCU\\CP2406\\Assignment 1\\project_mineral_super_trumps_game\\MstCards_151021.plist");
+        CardList playingCards = getPlayingCards();
+        System.out.println(playingCards.length());
 
-        CardList testCardList = new CardList(cardList);
-
-        System.out.println(testCardList.getCardAtIndex(0).toString() + " test cardlist");
-
-        //Debugging - print all card image filenames to prove it's loading the cards
-        for(int i = 0; i < cardList.size(); i++){
-            Map<String, String> currentMap = (Map)cardList.get(i);
-            System.out.println(currentMap.get("fileName"));
-            SupertrumpsCard testCard = new SupertrumpsCard(currentMap);
-            System.out.println(testCard.toString());
+        //Print card types of all cards
+        for (int i = 0; i < playingCards.length() -1; i++){
+           System.out.println( playingCards.getCardAtIndex(i).getType());
         }
     }
 
@@ -125,4 +119,24 @@ public class MineralSuperTrumpsGame {
             return new ArrayList();
         }
     }
+
+    public static CardList getPlayingCards(){
+        /*
+        Get CardList of playing (play & trump) cards only from the PLIST file
+         */
+        ArrayList cardList = loadCards("C:\\Users\\Heylon2\\OneDrive\\JCU\\CP2406\\Assignment 1\\project_mineral_super_trumps_game\\MstCards_151021.plist");
+        CardList playingCardList = new CardList(cardList);
+
+        for(int i = playingCardList.length() - 1; i > 0; i--){
+            SupertrumpsCard currentCard = playingCardList.getCardAtIndex(i);
+
+            if(!currentCard.getType().equals("play") && !currentCard.getType().equals("trump")){
+                playingCardList.removeCardAtIndex(i);
+            }
+
+        }
+
+        return playingCardList;
+    }
 }
+

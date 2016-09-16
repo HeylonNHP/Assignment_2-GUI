@@ -10,6 +10,7 @@ public class CardList {
     public CardList(){
         listOfCards = new ArrayList<>();
     }
+
     public CardList(ArrayList cardList){
         listOfCards = new ArrayList<>();
         for(int i = 0; i < cardList.size(); i++) {
@@ -25,5 +26,13 @@ public class CardList {
 
     public SupertrumpsCard getCardAtIndex(int index){
         return listOfCards.get(index);
+    }
+
+    public void removeCardAtIndex(int index){
+        listOfCards.remove(index);
+    }
+
+    public int length(){
+        return listOfCards.size();
     }
 }
