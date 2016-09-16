@@ -1,3 +1,4 @@
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,55 +8,66 @@ import java.util.Map;
  * a Card class already exists - so used SupertrumpsCard instead
  */
 public class SupertrumpsCard {
-    String fileName;
-    String imageName;
-    String card_type;
-    String title;
-    String chemistry;
-    String classification;
-    String crystal_system;
-    String[] occurrence;
 
-//Trump categories
-    List hardness;
-    List specific_gravity;
-    String cleavage;
-    String crustal_abundance;
-    String economic_value;
+    Map<String,String> cardAttributes;
 
     public SupertrumpsCard(Map<String, String> cardDetails){
-        if(cardDetails.containsKey("fileName")){
-            fileName = cardDetails.get("fileName");
-        }
-        if(cardDetails.containsKey("imageName")){
-            imageName = cardDetails.get("imageName");
-        }
-        if(cardDetails.containsKey("card_type")){
-            card_type = cardDetails.get("card_type");
-        }
-        if(cardDetails.containsKey("title")){
-            title = cardDetails.get("title");
-        }
-        if(cardDetails.containsKey("chemistry")){
-            chemistry = cardDetails.get("chemistry");
-        }
-        if(cardDetails.containsKey("classification")){
-            classification = cardDetails.get("classification");
-        }
-        if(cardDetails.containsKey("crystal_system")){
-            crystal_system = cardDetails.get("crystal_system");
-        }
-        if(cardDetails.containsKey("occurrence")){
-            String arrayString = cardDetails.get("occurrence");
-            occurrence = arrayString.split(",");
-        }
+        cardAttributes = cardDetails;
+    }
+
+    public String getType(){
+        return cardAttributes.get("card_type");
+    }
+
+    public String getTitle(){
+        return cardAttributes.get("title");
+    }
+
+    public String getChemistry(){
+        return cardAttributes.get("chemistry");
+    }
+
+    public String getClassification(){
+        return cardAttributes.get("classification");
+    }
+
+    public String getCrystalSystem(){
+        return cardAttributes.get("crystal_system");
+    }
+
+    public String[] getOccurrence(){
+        return cardAttributes.get("occurrence").split(",");
+    }
+
+    public String getHardness(){
+        return cardAttributes.get("hardness");
+    }
+
+    public String getSpecificGravity(){
+        return cardAttributes.get("specific_gravity");
+    }
+
+    public String getCleavage(){
+        return cardAttributes.get("cleavage");
+    }
+
+    public String getEconomicValue(){
+        return cardAttributes.get("economic_value");
+    }
+
+    public String getCrustalAbundance(){
+        return cardAttributes.get("crustal_abundance");
     }
 
     public String toString(){
         String occurenceTest = "";
-        for(int i = 0; i < occurrence.length; i++){
-            occurenceTest += occurrence[i];
+        if(cardAttributes.containsKey("occurrence")){
+            for(int i = 0; i < cardAttributes.get("occurrence").split(",").length; i++){
+                occurenceTest += cardAttributes.get("occurrence").split(",")[i];
+            }
         }
+
+
         return occurenceTest;
     }
 }
