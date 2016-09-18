@@ -34,13 +34,15 @@ public class MineralSuperTrumpsGame {
             userInput = inputDevice.next();
         }
     }
+
     public static void startGame(int players){
         CardList playingCards = getPlayingCards();
-        System.out.println(playingCards.length());
+        playingCards.shuffle();
 
+        System.out.println(playingCards.length());
         //Print card types of all cards
-        for (int i = 0; i < playingCards.length() -1; i++){
-           System.out.println( playingCards.getCardAtIndex(i).getType());
+        for (int i = 0; i < playingCards.length(); i++){
+           System.out.println(playingCards.getCardAtIndex(i).getType() + " " + playingCards.getCardAtIndex(i).getTitle());
         }
     }
 
@@ -70,7 +72,7 @@ public class MineralSuperTrumpsGame {
                     Node currentAttribute = cardAttributeList.item(j);
                     Node nextAttribute = currentAttribute;
 
-                    //Get get value corresponding to the current attributes key (nextAttribute) ignoring #Text nodes
+                    //Get value corresponding to the current attributes key (nextAttribute) ignoring #Text nodes
                     for (int h = (j+1); h < cardAttributeList.getLength(); h++){
                         if(cardAttributeList.item(h).getNodeType() == Node.ELEMENT_NODE){
                             nextAttribute = cardAttributeList.item(h);
@@ -122,7 +124,7 @@ public class MineralSuperTrumpsGame {
 
     public static CardList getPlayingCards(){
         /*
-        Get CardList of playing (play & trump) cards only from the PLIST file
+        Get CardList of playing (play & trump) cards only (NOT rule) from the PLIST file
          */
         ArrayList cardList = loadCards("C:\\Users\\Heylon2\\OneDrive\\JCU\\CP2406\\Assignment 1\\project_mineral_super_trumps_game\\MstCards_151021.plist");
         CardList playingCardList = new CardList(cardList);
@@ -133,7 +135,6 @@ public class MineralSuperTrumpsGame {
             if(!currentCard.getType().equals("play") && !currentCard.getType().equals("trump")){
                 playingCardList.removeCardAtIndex(i);
             }
-
         }
 
         return playingCardList;
