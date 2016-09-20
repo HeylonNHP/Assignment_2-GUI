@@ -9,11 +9,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
-import java.util.Map;
-import java.util.Scanner;
 public class MineralSuperTrumpsGame {
     public static void main(String[] args){
         final String MENU = "Please choose an option:\ns) Start game\nq) Quit\n>>> ";
@@ -36,13 +33,45 @@ public class MineralSuperTrumpsGame {
     }
 
     public static void startGame(int players){
+        Random randomGenerator = new Random();
         CardList playingCards = getPlayingCards();
         playingCards.shuffle();
 
-        System.out.println(playingCards.length());
         //Print card types of all cards
         for (int i = 0; i < playingCards.length(); i++){
            System.out.println(playingCards.getCardAtIndex(i).getType() + " " + playingCards.getCardAtIndex(i).getTitle());
+        }
+
+        //Create players
+        ArrayList<Object> playerList = new ArrayList<>();
+        //Add the dealer
+        int dealerType = randomGenerator.nextInt(2);
+        Boolean humanPlayerCreated = false;
+        switch (dealerType){
+            case 0:
+                playerList.add(new Player(true));
+                break;
+            case 1:
+                playerList.add(new HumanPlayer(true));
+                humanPlayerCreated = true;
+                break;
+        }
+        //Add other players
+        int humanPlayerPosition = randomGenerator.nextInt(players-1);
+        for(int i = 0; i < players - 1; i++){
+            if(i != humanPlayerPosition || humanPlayerCreated == true){
+                playerList.add(new Player());
+            }else{
+                playerList.add(new HumanPlayer());
+                humanPlayerCreated = true;
+            }
+        }
+
+        System.out.println(humanPlayerPosition + " " + humanPlayerCreated);
+
+        System.out.println(playerList.size());
+        for(int i = 0; i < playerList.size(); i++){
+            System.out.println(playerList.get(i).toString());
         }
     }
 
