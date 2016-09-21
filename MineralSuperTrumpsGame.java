@@ -37,7 +37,7 @@ public class MineralSuperTrumpsGame {
         CardList playingCards = getPlayingCards();
         playingCards.shuffle();
 
-        //Print card types of all cards
+        //Print card types of all cards DEBUG
         for (int i = 0; i < playingCards.length(); i++){
            System.out.println(playingCards.getCardAtIndex(i).getType() + " " + playingCards.getCardAtIndex(i).getTitle());
         }
@@ -67,8 +67,22 @@ public class MineralSuperTrumpsGame {
             }
         }
 
-        System.out.println(humanPlayerPosition + " " + humanPlayerCreated);
+        //System.out.println(humanPlayerPosition + " " + humanPlayerCreated);
 
+        //Deal cards
+        if(playerList.get(0) instanceof Player){
+            Player currentPlayer = (Player)playerList.get(0);
+            Object[] returned = currentPlayer.dealCards(playerList,playingCards);
+            playerList = (ArrayList<Object>) returned[0];
+            playingCards = (CardList) returned[1];
+        }else{
+            HumanPlayer currentPlayer = (HumanPlayer)playerList.get(0);
+            Object[] returned = currentPlayer.dealCards(playerList,playingCards);
+            playerList = (ArrayList<Object>) returned[0];
+            playingCards = (CardList) returned[1];
+        }
+
+        //DEBUG
         System.out.println(playerList.size());
         for(int i = 0; i < playerList.size(); i++){
             System.out.println(playerList.get(i).toString());
