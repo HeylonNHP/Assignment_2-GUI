@@ -99,9 +99,21 @@ public class MineralSuperTrumpsGame {
             System.out.println(playerList.get(i).toString());
         }
 
+
         //Play game
         Boolean gameWon = false;
         CardList playedCards = new CardList();
+        if (playerList.get(1) instanceof Player){
+            Player initialPlayer = (Player)playerList.get(1);
+            playedCards = initialPlayer.takeInitialTurn(playedCards);
+            playerList.set(1, initialPlayer);
+        }else{
+            HumanPlayer initialPlayer = (HumanPlayer)playerList.get(1);
+            playedCards = initialPlayer.takeInitialTurn(playedCards);
+            playerList.set(1, initialPlayer);
+        }
+
+
         while (gameWon == false){
 
         }
