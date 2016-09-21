@@ -59,6 +59,10 @@ public class SupertrumpsCard {
         return cardAttributes.get("crustal_abundance");
     }
 
+    public String getSubtitle(){
+        return cardAttributes.get("subtitle");
+    }
+
     public String toString(){
         String occurenceTest = "";
         if(cardAttributes.containsKey("occurrence")){

@@ -37,9 +37,20 @@ public class MineralSuperTrumpsGame {
         CardList playingCards = getPlayingCards();
         playingCards.shuffle();
 
+        ArrayList<String> atList = new ArrayList<>();
+
         //Print card types of all cards DEBUG
         for (int i = 0; i < playingCards.length(); i++){
            System.out.println(playingCards.getCardAtIndex(i).getType() + " " + playingCards.getCardAtIndex(i).getTitle());
+            if (playingCards.getCardAtIndex(i).getSpecificGravity() != null) {
+                if (!atList.contains(playingCards.getCardAtIndex(i).getSpecificGravity())) {
+                    atList.add(playingCards.getCardAtIndex(i).getSpecificGravity());
+                }
+            }
+        }
+        System.out.println("--------------------");
+        for(String val : atList){
+            System.out.println(val);
         }
 
         //Create players
@@ -86,6 +97,13 @@ public class MineralSuperTrumpsGame {
         System.out.println(playerList.size());
         for(int i = 0; i < playerList.size(); i++){
             System.out.println(playerList.get(i).toString());
+        }
+
+        //Play game
+        Boolean gameWon = false;
+        CardList playedCards = new CardList();
+        while (gameWon == false){
+
         }
     }
 
