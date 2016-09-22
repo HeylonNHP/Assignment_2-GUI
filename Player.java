@@ -54,7 +54,7 @@ public class Player {
 
     }
 
-    public CardList takeInitialTurn(CardList playedCards){
+    public Object[] takeInitialTurn(CardList playedCards){
         /*Take first turn in game i.e.
         * play first card and choose playing category*/
         String chosenCategory = pickCardCategory();
@@ -64,7 +64,12 @@ public class Player {
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
         stateCard(chosenCategory, chosenCard);
         playedCards.addCard(chosenCard);
-        return playedCards;
+        return new Object[]{playedCards, chosenCategory};
+    }
+
+    public Object[] takeTurn(CardList playedCards, CardList deck, String category){
+
+        return new Object[]{};
     }
 
     private void stateCard(String category, SupertrumpsCard card){
@@ -84,6 +89,7 @@ public class Player {
     }
 
     private int getLowestValueCardInCategory(String category){
+        /*Get lowest value card in chosen category*/
         if (category.equals("Economic value")){
             int lowestValueCardID = 0;
             int lowestValue = econonmicValue.length -1;
@@ -150,7 +156,7 @@ public class Player {
                     }else {
                         String currentString = myCards.getCardAtIndex(i).getHardness();
                         String[] range = currentString.split("-");
-                        currentValue = Double.parseDouble(range[0]);
+                        currentValue = Double.parseDouble(range[1]);
                     }
                     //System.out.println("i: " + i + "cv: " + currentValue);
                     if(currentValue < lowestValue || lowestValue == -1){
@@ -171,7 +177,7 @@ public class Player {
                     }else {
                         String currentString = myCards.getCardAtIndex(i).getSpecificGravity();
                         String[] range = currentString.split("-");
-                        currentValue = Double.parseDouble(range[0]);
+                        currentValue = Double.parseDouble(range[1]);
                     }
                     //System.out.println("i: " + i + "cv: " + currentValue);
                     if(currentValue < lowestValue || lowestValue == -1){

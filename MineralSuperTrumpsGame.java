@@ -52,6 +52,7 @@ public class MineralSuperTrumpsGame {
         for(String val : atList){
             System.out.println(val);
         }
+        //-----------------------------------------
 
         //Create players
         ArrayList<Object> playerList = new ArrayList<>();
@@ -103,19 +104,46 @@ public class MineralSuperTrumpsGame {
         //Play game
         Boolean gameWon = false;
         CardList playedCards = new CardList();
-        if (playerList.get(1) instanceof Player){
-            Player initialPlayer = (Player)playerList.get(1);
-            playedCards = initialPlayer.takeInitialTurn(playedCards);
-            playerList.set(1, initialPlayer);
+        int playerPosition = 1;
+        String category = "";
+
+        if (playerList.get(playerPosition) instanceof Player){
+            Player initialPlayer = (Player)playerList.get(playerPosition);
+
+            Object[] returned = initialPlayer.takeInitialTurn(playedCards);
+            playedCards = (CardList)returned[0];
+            category = (String)returned[1];
+
+            playerList.set(playerPosition, initialPlayer);
         }else{
-            HumanPlayer initialPlayer = (HumanPlayer)playerList.get(1);
-            playedCards = initialPlayer.takeInitialTurn(playedCards);
-            playerList.set(1, initialPlayer);
+            HumanPlayer initialPlayer = (HumanPlayer)playerList.get(playerPosition);
+
+            Object[] returned = initialPlayer.takeInitialTurn(playedCards);
+            playedCards = (CardList)returned[0];
+            category = (String)returned[1];
+
+            playerList.set(playerPosition, initialPlayer);
         }
 
+        playerPosition += 1;
 
         while (gameWon == false){
+            if(playerList.get(playerPosition) instanceof Player){
+                Player currentPlayer = (Player)playerList.get(playerPosition);
 
+                Object[] returned = currentPlayer.takeTurn(playedCards, playingCards, category);
+            }else{
+                HumanPlayer currentPlayer = (HumanPlayer)playerList.get(playerPosition);
+
+                Object[] returned = currentPlayer.takeTurn(playedCards,playingCards,category);
+            }
+
+            //Execute at end of while block
+            if (playerPosition == playerList.size() -1){
+                playerPosition = 0;
+            }else{
+                playerPosition += 1;
+            }
         }
     }
 
