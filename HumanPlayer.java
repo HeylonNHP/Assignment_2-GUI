@@ -146,11 +146,11 @@ public class HumanPlayer {
 
         //Get card choice
         int cardChoice = inputDevice.nextInt();
-        Boolean validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category);
+        Boolean validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
         while (validChoice == false){
             System.out.println("Invalid choice");
             cardChoice = inputDevice.nextInt();
-            validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category);
+            validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
         }
 
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(cardChoice);
@@ -161,11 +161,29 @@ public class HumanPlayer {
         playedCards.addCard(chosenCard);
 
         //if chosen card is trump - force player to play another card here
+        if (chosenCard.getType().equals("trump")) {
+            previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
+
+            System.out.println("You just played a trump card. Please pick another mineral card to play:");
+
+            displayCardList();
+
+            cardChoice = inputDevice.nextInt();
+            validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
+            while (validChoice == false) {
+                System.out.println("Invalid choice");
+                cardChoice = inputDevice.nextInt();
+                validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
+            }
+            chosenCard = myCards.takeCardAtIndex(cardChoice);
+            stateCard(category, chosenCard);
+            playedCards.addCard(chosenCard);
+        }
 
         return new Object[]{playedCards, deck, category};
     }
 
-    private Boolean validCardChoice(int cardChoice, SupertrumpsCard previousCard, String category){
+    private Boolean validCardChoice(int cardChoice, SupertrumpsCard previousCard, String category, Boolean allowTrump){
         if(cardChoice < 0 || cardChoice > myCards.length()-1){
             System.out.println("Selection out of range!");
             return false;
@@ -174,6 +192,14 @@ public class HumanPlayer {
         SupertrumpsCard selectedCard = myCards.getCardAtIndex(cardChoice);
 
         if (selectedCard.getType().equals("trump")){
+            if (allowTrump){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        if(previousCard.getType().equals("trump")){
             return true;
         }
 
@@ -186,6 +212,9 @@ public class HumanPlayer {
     }
 
     private Boolean cardHasLowerValue(SupertrumpsCard card1, SupertrumpsCard card2, String category){
+        /*
+        Check to see whether card1 has a lower value than card2 in the specified category
+        */
         if(category.equals("Economic value")){
             int card1Value = -1;
             int card2Value = -1;

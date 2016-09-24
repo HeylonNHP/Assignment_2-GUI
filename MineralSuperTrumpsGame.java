@@ -136,6 +136,9 @@ public class MineralSuperTrumpsGame {
                 HumanPlayer currentPlayer = (HumanPlayer)playerList.get(playerPosition);
 
                 Object[] returned = currentPlayer.takeTurn(playedCards,playingCards,category);
+                playedCards = (CardList)returned[0];
+                playingCards = (CardList)returned[1];
+                category = (String)returned[2];
             }
 
             //Execute at end of while block
