@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class HumanPlayer {
     private CardList myCards = new CardList();
     private Boolean isDealer;
+    private Boolean hasPassed = false;
 
     String[] cleavage = new String[]{"none","poor/none","1 poor","2 poor","1 good","1 good, 1 poor","2 good","3 good","1 perfect","1 perfect, 1 good","1 perfect, 2 good","2 perfect, 1 good","3 perfect","4 perfect","6 perfect"
     };
@@ -28,6 +29,7 @@ public class HumanPlayer {
     }
 
     public Object[] takeInitialTurn(CardList playedCards){
+        /*Take the very first turn of a game*/
         ArrayList<String> categories = new ArrayList<>();
         categories.add("Economic value");
         categories.add("Crustal abundance");
@@ -42,11 +44,54 @@ public class HumanPlayer {
 
         displayCardList();
 
-        System.out.println("Choose a category");
+        System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
+                "c) Cleavage\ns) Specific gravity");
         String categoryChoice = inputDevice.next();
-        while (!categories.contains(categoryChoice)){
-            System.out.println("Incorrect input, please try again\n Choose a category");
+
+        String newCategory = "";
+
+        switch (categoryChoice.toLowerCase()){
+            case "e":
+                newCategory = categories.get(0);
+                break;
+            case "a":
+                newCategory = categories.get(1);
+                break;
+            case "h":
+                newCategory = categories.get(2);
+                break;
+            case "c":
+                newCategory = categories.get(3);
+                break;
+            case "s":
+                newCategory = categories.get(4);
+                break;
+            default:
+                System.out.println("Incorrect input please try again.");
+        }
+        while (newCategory.equals("")){
+            System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
+                    "c) Cleavage\ns) Specific gravity");
             categoryChoice = inputDevice.next();
+            switch (categoryChoice.toLowerCase()){
+                case "e":
+                    newCategory = categories.get(0);
+                    break;
+                case "a":
+                    newCategory = categories.get(1);
+                    break;
+                case "h":
+                    newCategory = categories.get(2);
+                    break;
+                case "c":
+                    newCategory = categories.get(3);
+                    break;
+                case "s":
+                    newCategory = categories.get(4);
+                    break;
+                default:
+                    System.out.println("Incorrect input please try again.");
+            }
         }
 
         System.out.println("Choose a card");
@@ -58,20 +103,27 @@ public class HumanPlayer {
 
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(cardChoice);
 
-        stateCard(categoryChoice, chosenCard);
+        stateCard(newCategory, chosenCard);
 
         playedCards.addCard(chosenCard);
-        return new Object[]{playedCards, categoryChoice};
+        return new Object[]{playedCards, newCategory};
     }
 
     public Object[] takeTurn(CardList playedCards, CardList deck, String category){
         Scanner inputDevice = new Scanner(System.in);
         SupertrumpsCard previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
+
+        if (getHasPassed() == true){
+            System.out.println("You have passed - your turn is being skipped. Press enter to continue.");
+            inputDevice.nextLine();
+            return new Object[]{playedCards, deck, category};
+        }
+
         System.out.println("It's your turn. Pick a card to play: ");
 
         displayCardList();
 
-        //Add check to see if player has any cards that can be played - if not allow them to pass
+        //check to see if player has any cards that can be played - if not then skip turn
         Boolean hasPlayableCard = false;
         for (int i = 0; i < myCards.length(); i++){
             if (!myCards.getCardAtIndex(i).getType().equals("trump")){
@@ -81,19 +133,56 @@ public class HumanPlayer {
             }else{
                 hasPlayableCard = true;
             }
+        }
 
-        }
-        if (hasPlayableCard = true){
+        if (hasPlayableCard == true){
             System.out.println("You have playable cards");
+        }else {
+            System.out.println("You don't have any playable cards, your turn is being skipped. Press enter to continue.");
+            inputDevice.nextLine();
+            setHasPassed(true);
+            return new Object[]{playedCards, deck, category};
         }
+
         //Get card choice
         int cardChoice = inputDevice.nextInt();
-        while (cardChoice < 0 || cardChoice > myCards.length()-1){
-            System.out.println("Out of range\nChoose a card");
+        Boolean validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category);
+        while (validChoice == false){
+            System.out.println("Invalid choice");
             cardChoice = inputDevice.nextInt();
+            validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category);
         }
 
-        return new Object[]{};
+        SupertrumpsCard chosenCard = myCards.takeCardAtIndex(cardChoice);
+        if (chosenCard.getType().equals("trump")){
+            category = chosenCard.getSubtitle();
+        }
+        stateCard(category, chosenCard);
+        playedCards.addCard(chosenCard);
+
+        //if chosen card is trump - force player to play another card here
+
+        return new Object[]{playedCards, deck, category};
+    }
+
+    private Boolean validCardChoice(int cardChoice, SupertrumpsCard previousCard, String category){
+        if(cardChoice < 0 || cardChoice > myCards.length()-1){
+            System.out.println("Selection out of range!");
+            return false;
+        }
+
+        SupertrumpsCard selectedCard = myCards.getCardAtIndex(cardChoice);
+
+        if (selectedCard.getType().equals("trump")){
+            return true;
+        }
+
+        if (cardHasLowerValue(previousCard, selectedCard, category)){
+            return true;
+        }else{
+            System.out.println("Please choose a card with a higher value than the one which was just played.");
+            return false;
+        }
     }
 
     private Boolean cardHasLowerValue(SupertrumpsCard card1, SupertrumpsCard card2, String category){
@@ -175,7 +264,7 @@ public class HumanPlayer {
     private void displayCardList(){
         for(int i = 0; i < myCards.length(); i++){
             SupertrumpsCard currentCard = myCards.getCardAtIndex(i);
-            System.out.print("Card #" + (i + 1) + " ");
+            System.out.print("Card #" + i + " ");
 
             if (!myCards.getCardAtIndex(i).getType().equals("trump")) {
                 System.out.print("Mineral: " + currentCard.getTitle() + " ");
@@ -231,6 +320,13 @@ public class HumanPlayer {
 
         }
         return new Object[]{playerList,deck};
+    }
+
+    public Boolean getHasPassed(){
+        return hasPassed;
+    }
+    public void setHasPassed(boolean value){
+        hasPassed = value;
     }
 
     public String toString(){
