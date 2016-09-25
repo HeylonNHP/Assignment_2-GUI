@@ -44,55 +44,7 @@ public class HumanPlayer {
 
         displayCardList();
 
-        System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
-                "c) Cleavage\ns) Specific gravity");
-        String categoryChoice = inputDevice.next();
-
-        String newCategory = "";
-
-        switch (categoryChoice.toLowerCase()){
-            case "e":
-                newCategory = categories.get(0);
-                break;
-            case "a":
-                newCategory = categories.get(1);
-                break;
-            case "h":
-                newCategory = categories.get(2);
-                break;
-            case "c":
-                newCategory = categories.get(3);
-                break;
-            case "s":
-                newCategory = categories.get(4);
-                break;
-            default:
-                System.out.println("Incorrect input please try again.");
-        }
-        while (newCategory.equals("")){
-            System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
-                    "c) Cleavage\ns) Specific gravity");
-            categoryChoice = inputDevice.next();
-            switch (categoryChoice.toLowerCase()){
-                case "e":
-                    newCategory = categories.get(0);
-                    break;
-                case "a":
-                    newCategory = categories.get(1);
-                    break;
-                case "h":
-                    newCategory = categories.get(2);
-                    break;
-                case "c":
-                    newCategory = categories.get(3);
-                    break;
-                case "s":
-                    newCategory = categories.get(4);
-                    break;
-                default:
-                    System.out.println("Incorrect input please try again.");
-            }
-        }
+        String newCategory = chooseCategory();
 
         System.out.println("Choose a card");
         int cardChoice = inputDevice.nextInt();
@@ -131,16 +83,25 @@ public class HumanPlayer {
                     hasPlayableCard = true;
                 }
             }else{
-                hasPlayableCard = true;
+                if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
+                    hasPlayableCard = true;
+                }
             }
         }
 
         if (hasPlayableCard == true){
             System.out.println("You have playable cards");
         }else {
-            System.out.println("You don't have any playable cards, your turn is being skipped. Press enter to continue.");
-            inputDevice.nextLine();
             setHasPassed(true);
+
+            if (deck.length() != 0){
+                myCards.addCard(deck.takeCardAtIndex(deck.length()-1));
+                System.out.println("You don't have any playable cards, you pick up one card from the deck and pass. Press enter to continue.");
+            }else {
+                System.out.println("You don't have any playable cards, you pass without picking up any cards. Press enter to continue.");
+            }
+
+            inputDevice.nextLine();
             return new Object[]{playedCards, deck, category};
         }
 
@@ -154,8 +115,14 @@ public class HumanPlayer {
         }
 
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(cardChoice);
+
         if (chosenCard.getType().equals("trump")){
-            category = chosenCard.getSubtitle();
+            if (chosenCard.getTitle().equals("The Geologist")){
+                System.out.println("You played The Geologist trump card! You're free to choose which category to change into.");
+                category = chooseCategory();
+            }else{
+                category = chosenCard.getSubtitle();
+            }
         }
         stateCard(category, chosenCard);
         playedCards.addCard(chosenCard);
@@ -192,6 +159,10 @@ public class HumanPlayer {
         SupertrumpsCard selectedCard = myCards.getCardAtIndex(cardChoice);
 
         if (selectedCard.getType().equals("trump")){
+            if(selectedCard.getSubtitle().equals(category)){
+                System.out.println("We are already playing in the same category as the chosen trump card.");
+                return false;
+            }
             if (allowTrump){
                 return true;
             }else{
@@ -208,6 +179,46 @@ public class HumanPlayer {
         }else{
             System.out.println("Please choose a card with a higher value than the one which was just played.");
             return false;
+        }
+    }
+
+    private String chooseCategory(){
+        Scanner inputDevice = new Scanner(System.in);
+        System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
+                "c) Cleavage\ns) Specific gravity");
+        String newCategory = inputDevice.next();
+        switch (newCategory){
+            case "e":
+                return "Economic value";
+            case "a":
+                return "Crustal abundance";
+            case "h":
+                return "Hardness";
+            case "c":
+                return "Cleavage";
+            case "s":
+                return "Specific gravity";
+            default:
+                System.out.println("Invalid input please try again.");
+        }
+        while (true){
+            System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
+                    "c) Cleavage\ns) Specific gravity");
+            newCategory = inputDevice.next();
+            switch (newCategory){
+                case "e":
+                    return "Economic value";
+                case "a":
+                    return "Crustal abundance";
+                case "h":
+                    return "Hardness";
+                case "c":
+                    return "Cleavage";
+                case "s":
+                    return "Specific gravity";
+                default:
+                    System.out.println("Invalid input please try again.");
+            }
         }
     }
 
@@ -291,6 +302,9 @@ public class HumanPlayer {
     }
 
     private void displayCardList(){
+        /*
+        Display list of held cards to user
+         */
         for(int i = 0; i < myCards.length(); i++){
             SupertrumpsCard currentCard = myCards.getCardAtIndex(i);
             System.out.print("Card #" + i + " ");
