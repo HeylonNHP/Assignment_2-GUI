@@ -310,14 +310,15 @@ public class HumanPlayer {
             System.out.print("Card #" + i + " ");
 
             if (!myCards.getCardAtIndex(i).getType().equals("trump")) {
-                System.out.print("Mineral: " + currentCard.getTitle() + " ");
-                System.out.print("Economic value: " + currentCard.getEconomicValue() + " ");
-                System.out.print("Crustal abundance: " + currentCard.getCrustalAbundance() + " ");
-                System.out.print("Hardness: " + currentCard.getHardness() + " ");
-                System.out.print("Cleavage: " + currentCard.getCleavage() + " ");
-                System.out.println("Specific gravity: " + currentCard.getSpecificGravity());
+                String cardAttributes = String.format("Mineral: %1$-13s Economic value: %2$-10s Crustal abundance: %3$-10s " +
+                                "Hardness: %4$-9s Cleavage: %5$-17s Specific gravity: %6$-10s",
+                        currentCard.getTitle(), currentCard.getEconomicValue(), currentCard.getCrustalAbundance(),
+                        currentCard.getHardness(), currentCard.getCleavage(), currentCard.getSpecificGravity());
+                System.out.println(cardAttributes);
             }else{
-                System.out.println("Trump card: " + currentCard.getSubtitle());
+                String cardAttributes = String.format("Trump card: %1$-16s Category: %2$-15s", currentCard.getTitle(),
+                        currentCard.getSubtitle());
+                System.out.println(cardAttributes);
             }
         }
     }
