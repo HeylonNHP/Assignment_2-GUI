@@ -6,6 +6,7 @@ import java.util.*;
 public class Player {
     private CardList myCards = new CardList();
     private Boolean isDealer;
+    private Boolean hasPassed = false;
 
     String[] cleavage = new String[]{"none","poor/none","1 poor","2 poor","1 good","1 good, 1 poor","2 good","3 good","1 perfect","1 perfect, 1 good","1 perfect, 2 good","2 perfect, 1 good","3 perfect","4 perfect","6 perfect"
     };
@@ -50,10 +51,6 @@ public class Player {
         return cards;
     }
 
-    public void takeTurn(CardList availableCards, CardList playedCards){
-
-    }
-
     public Object[] takeInitialTurn(CardList playedCards){
         /*Take first turn in game i.e.
         * play first card and choose playing category*/
@@ -62,18 +59,145 @@ public class Player {
         //Play lowest value card in chosen category
         int chosenCardIndex = getLowestValueCardInCategory(chosenCategory);
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
-        stateCard(chosenCategory, chosenCard);
+        stateCard(chosenCategory, chosenCard, "");
         playedCards.addCard(chosenCard);
         return new Object[]{playedCards, chosenCategory};
     }
 
-    public Object[] takeTurn(CardList playedCards, CardList deck, String category){
+    public Object[] takeTurn(CardList playedCards, CardList deck, String category, int playerNumber){
+        SupertrumpsCard previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
+        String playerName = "CPU player " + playerNumber;
 
-        return new Object[]{};
+        if (hasPassed){
+            System.out.println(playerName + " has passed.");
+            return new Object[]{playedCards, deck, category};
+        }
+
+        Boolean hasPlayableCard = false;
+        for (int i = 0; i < myCards.length(); i++){
+            if (!myCards.getCardAtIndex(i).getType().equals("trump")){
+                if (cardHasLowerValue(previouslyPlayedCard, myCards.getCardAtIndex(i), category)){
+                    hasPlayableCard = true;
+                }
+            }else{
+                if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
+                    hasPlayableCard = true;
+                }
+            }
+        }
+
+        if (!hasPlayableCard){
+            setHasPassed(true);
+            if (deck.length() != 0){
+                myCards.addCard(deck.takeCardAtIndex(deck.length()-1));
+            }
+            System.out.println(playerName + " doesn't have any playable cards and has passed.");
+            return new Object[]{playedCards, deck, category};
+        }
+
+        int chosenCardIndex = chooseCardToPlay(previouslyPlayedCard,category);
+
+        SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
+
+        if (chosenCard.getType().equals("trump")){
+            if (chosenCard.getTitle().equals("The Geologist")){
+                //Include smart logic to choose category
+                System.out.println(playerName + " played a wild trump card");
+                String newCategory = pickCardCategory();
+
+                while (newCategory.equals(category)){
+                    newCategory = pickCardCategory();
+                }
+
+                category = newCategory;
+            }else{
+                category = chosenCard.getSubtitle();
+            }
+        }
+
+        stateCard(category, chosenCard, playerName);
+        playedCards.addCard(chosenCard);
+
+        previouslyPlayedCard = chosenCard;
+
+        if (chosenCard.getType().equals("trump")){
+            //play a second card
+            if (myCards.length() != 0){
+                chosenCardIndex = chooseCardToPlay(previouslyPlayedCard,category);
+                chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
+                stateCard(category,chosenCard, playerName);
+                playedCards.addCard(chosenCard);
+
+            }
+        }
+
+        return new Object[]{playedCards, deck, category};
     }
 
-    private void stateCard(String category, SupertrumpsCard card){
-        System.out.print("Played card " + card.getTitle() + " ");
+    private int chooseCardToPlay(SupertrumpsCard previouslyPlayedCard, String category){
+        ArrayList playableCardIndexes = new ArrayList();
+        Boolean playableNonTrumpCards = false;
+        if (!previouslyPlayedCard.getType().equals("trump")) {
+            for (int i = 0; i < myCards.length(); i++) {
+                if (myCards.getCardAtIndex(i).getType().equals("trump")) {
+                    if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
+                        playableCardIndexes.add(i);
+                    }
+                } else if (cardHasLowerValue(previouslyPlayedCard, myCards.getCardAtIndex(i), category)) {
+                    playableCardIndexes.add(i);
+                    playableNonTrumpCards = true;
+                }
+            }
+        }else{
+            System.out.println("Previous card was trump");
+            for (int i = 0; i < myCards.length(); i++){
+                if (!myCards.getCardAtIndex(i).getType().equals("trump")) {
+                    playableCardIndexes.add(i);
+                    playableNonTrumpCards = true;
+                }
+            }
+        }
+
+        if (playableNonTrumpCards){
+            //Find lowest value mineral card in category and play it
+            int lowestValuePlayableCardIndex = (int)playableCardIndexes.get(0);
+
+            //Get non-trump card
+            for (int i = 0; i < playableCardIndexes.size(); i++){
+                int currentIndex = (int)playableCardIndexes.get(i);
+                if (!myCards.getCardAtIndex(currentIndex).getType().equals("trump")){
+                    lowestValuePlayableCardIndex = currentIndex;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < playableCardIndexes.size(); i++){
+                int currentIndex = (int)playableCardIndexes.get(i);
+                if (!myCards.getCardAtIndex(currentIndex).getType().equals("trump")){
+                    if (cardHasLowerValue(myCards.getCardAtIndex(currentIndex), myCards.getCardAtIndex(lowestValuePlayableCardIndex),category)){
+                        lowestValuePlayableCardIndex = currentIndex;
+                    }
+                }
+            }
+            //System.out.println("Lowest playable card index " + lowestValuePlayableCardIndex);
+            return lowestValuePlayableCardIndex;
+        }else{
+            ArrayList availableTrumpCards = new ArrayList();
+            for (int i = 0; i < playableCardIndexes.size(); i++){
+                int currentIndex = (int)playableCardIndexes.get(i);
+                if (myCards.getCardAtIndex(currentIndex).getType().equals("trump")){
+                    availableTrumpCards.add(currentIndex);
+                }
+            }
+
+            //Replace with smart logic to choose trump card
+            System.out.println("Playing trump");
+            return (int)availableTrumpCards.get(0);
+        }
+    }
+
+    private void stateCard(String category, SupertrumpsCard card, String playerName){
+        System.out.print(playerName + " played card " + card.getTitle() + " ");
         if(category.equals("Economic value")){
             System.out.println("Economic value " + card.getEconomicValue());
 
@@ -191,6 +315,85 @@ public class Player {
         return 0;
     }
 
+    private Boolean cardHasLowerValue(SupertrumpsCard card1, SupertrumpsCard card2, String category){
+        /*
+        Check to see whether card1 has a lower value than card2 in the specified category
+        */
+        if(category.equals("Economic value")){
+            int card1Value = -1;
+            int card2Value = -1;
+            for(int i = 0; i < econonmicValue.length; i++){
+                if(card1.getEconomicValue().equals(econonmicValue[i])){
+                    card1Value = i;
+                }
+                if (card2.getEconomicValue().equals(econonmicValue[i])){
+                    card2Value = i;
+                }
+            }
+            return card1Value < card2Value;
+
+        }else if(category.equals("Crustal abundance")){
+            int card1Value = -1;
+            int card2Value = -1;
+            for(int i = 0; i < crustalAbundance.length; i++){
+                if(card1.getCrustalAbundance().equals(crustalAbundance[i])){
+                    card1Value = i;
+                }
+                if (card2.getCrustalAbundance().equals(crustalAbundance[i])){
+                    card2Value = i;
+                }
+            }
+            return card1Value < card2Value;
+
+        }else if(category.equals("Cleavage")){
+            int card1Value = -1;
+            int card2Value = -1;
+            for(int i = 0; i < cleavage.length; i++){
+                if(card1.getCleavage().equals(cleavage[i])){
+                    card1Value = i;
+                }
+                if (card2.getCleavage().equals(cleavage[i])){
+                    card2Value = i;
+                }
+            }
+            return card1Value < card2Value;
+
+        }else if(category.equals("Hardness")){
+            double card1Value = -1;
+            double card2Value = -1;
+            if (!card1.getHardness().contains("-")){
+                card1Value = Double.parseDouble(card1.getHardness());
+            }else{
+                String[] range = card1.getHardness().split("-");
+                card1Value = Double.parseDouble(range[1]);
+            }
+            if (!card2.getHardness().contains("-")){
+                card2Value = Double.parseDouble(card2.getHardness());
+            }else{
+                String[] range = card2.getHardness().split("-");
+                card2Value = Double.parseDouble(range[1]);
+            }
+            return card1Value < card2Value;
+        }else if(category.equals("Specific gravity")){
+            double card1Value = -1;
+            double card2Value = -1;
+            if (!card1.getSpecificGravity().contains("-")){
+                card1Value = Double.parseDouble(card1.getSpecificGravity());
+            }else{
+                String[] range = card1.getSpecificGravity().split("-");
+                card1Value = Double.parseDouble(range[1]);
+            }
+            if (!card2.getSpecificGravity().contains("-")){
+                card2Value = Double.parseDouble(card2.getSpecificGravity());
+            }else{
+                String[] range = card2.getSpecificGravity().split("-");
+                card2Value = Double.parseDouble(range[1]);
+            }
+            return card1Value < card2Value;
+        }
+        return false;
+    }
+
     private String pickCardCategory(){
         ArrayList<String> categories = new ArrayList<>();
         categories.add("Economic value");
@@ -215,6 +418,12 @@ public class Player {
         return categories.get(selectedCategory);
     }
 
+    public Boolean getHasPassed(){
+        return hasPassed;
+    }
+    public void setHasPassed(Boolean value){
+        hasPassed = value;
+    }
     public String toString(){
         return "CPU player - is dealer: " + isDealer.toString() + " has " + myCards.length() + " cards";
     }

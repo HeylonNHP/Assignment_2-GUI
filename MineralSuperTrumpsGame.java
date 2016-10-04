@@ -131,7 +131,10 @@ public class MineralSuperTrumpsGame {
             if(playerList.get(playerPosition) instanceof Player){
                 Player currentPlayer = (Player)playerList.get(playerPosition);
 
-                Object[] returned = currentPlayer.takeTurn(playedCards, playingCards, category);
+                Object[] returned = currentPlayer.takeTurn(playedCards, playingCards, category, playerPosition);
+                playedCards = (CardList)returned[0];
+                playingCards = (CardList)returned[1];
+                category = (String)returned[2];
             }else{
                 HumanPlayer currentPlayer = (HumanPlayer)playerList.get(playerPosition);
 
@@ -139,6 +142,57 @@ public class MineralSuperTrumpsGame {
                 playedCards = (CardList)returned[0];
                 playingCards = (CardList)returned[1];
                 category = (String)returned[2];
+            }
+
+            //Check if all but one or less players have passed
+            int nonPassedPlayerAmount = playerList.size();
+            int nonPassedPlayer = -1;
+            for (int i = 0; i < playerList.size(); i++){
+                if (playerList.get(i) instanceof Player){
+                    Player currentPlayer = (Player)playerList.get(i);
+                    if (currentPlayer.getHasPassed() == true){
+                        nonPassedPlayerAmount--;
+                    }else{
+                        nonPassedPlayer = i;
+                    }
+                }else{
+                    HumanPlayer currentPlayer = (HumanPlayer)playerList.get(i);
+                    if (currentPlayer.getHasPassed() == true){
+                        nonPassedPlayerAmount--;
+                    }else{
+                        nonPassedPlayer = i;
+                    }
+                }
+            }
+
+            if (nonPassedPlayerAmount <= 1){
+                //Start new round
+                System.out.println("Starting new round");
+                for (int i = 0; i < playerList.size(); i++){
+                    if (playerList.get(i) instanceof Player){
+                        Player currentPlayer = (Player)playerList.get(i);
+                        if (currentPlayer.getHasPassed()){
+                            currentPlayer.setHasPassed(false);
+                        }else{
+                            Object[] returned = currentPlayer.takeInitialTurn(playingCards);
+                            playerPosition = i;
+                            playedCards = (CardList)returned[0];
+                            category = (String)returned[1];
+                            playerList.set(playerPosition, currentPlayer);
+                        }
+                    }else{
+                        HumanPlayer currentPlayer = (HumanPlayer)playerList.get(i);
+                        if (currentPlayer.getHasPassed()){
+                            currentPlayer.setHasPassed(false);
+                        }else{
+                            Object[] returned = currentPlayer.takeInitialTurn(playingCards);
+                            playerPosition = i;
+                            playedCards = (CardList)returned[0];
+                            category = (String)returned[1];
+                            playerList.set(playerPosition, currentPlayer);
+                        }
+                    }
+                }
             }
 
             //Execute at end of while block
