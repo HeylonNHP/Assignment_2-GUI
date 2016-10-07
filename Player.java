@@ -418,6 +418,14 @@ public class Player {
         return categories.get(selectedCategory);
     }
 
+    public Boolean hasCards(){
+        if (myCards.length() == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public Boolean getHasPassed(){
         return hasPassed;
     }

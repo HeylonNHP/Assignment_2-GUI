@@ -39,7 +39,6 @@ public class HumanPlayer {
 
         Scanner inputDevice = new Scanner(System.in);
 
-        System.out.println("You're starting the game");
         System.out.println("Your cards are: ");
 
         displayCardList();
@@ -364,6 +363,14 @@ public class HumanPlayer {
 
         }
         return new Object[]{playerList,deck};
+    }
+
+    public Boolean hasCards(){
+        if (myCards.length() == 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public Boolean getHasPassed(){

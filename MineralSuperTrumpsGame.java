@@ -24,6 +24,11 @@ public class MineralSuperTrumpsGame {
                 case "s":
                     System.out.print("Number of players (including you) (3-5) ");
                     int players = inputDevice.nextInt();
+                    while (players < 3 || players > 5){
+                        System.out.println("Out of range. Try again.");
+                        System.out.print("Number of players (including you) (3-5) ");
+                        players = inputDevice.nextInt();
+                    }
                     startGame(players);
                     break;
             }
@@ -48,10 +53,11 @@ public class MineralSuperTrumpsGame {
                 }
             }
         }
-        System.out.println("--------------------");
+        /*System.out.println("--------------------");
         for(String val : atList){
             System.out.println(val);
-        }
+        }*/
+
         //-----------------------------------------
 
         //Create players
@@ -118,6 +124,7 @@ public class MineralSuperTrumpsGame {
         }else{
             HumanPlayer initialPlayer = (HumanPlayer)playerList.get(playerPosition);
 
+            System.out.println("You're starting the game");
             Object[] returned = initialPlayer.takeInitialTurn(playedCards);
             playedCards = (CardList)returned[0];
             category = (String)returned[1];
