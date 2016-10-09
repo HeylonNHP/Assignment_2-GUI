@@ -7,6 +7,7 @@ public class Player {
     private CardList myCards = new CardList();
     private Boolean isDealer;
     private Boolean hasPassed = false;
+    private String playerName;
 
     String[] cleavage = new String[]{"none","poor/none","1 poor","2 poor","1 good","1 good, 1 poor","2 good","3 good","1 perfect","1 perfect, 1 good","1 perfect, 2 good","2 perfect, 1 good","3 perfect","4 perfect","6 perfect"
     };
@@ -18,9 +19,15 @@ public class Player {
 
     public Player(){
         isDealer = false;
+        setName("Bob");
     }
     public Player(Boolean dealer){
         isDealer = dealer;
+        setName("Bob");
+    }
+    public Player(Boolean dealer, String name){
+        isDealer = dealer;
+        setName(name);
     }
 
     public Object[] dealCards(ArrayList<Object> playerList, CardList deck){
@@ -59,14 +66,13 @@ public class Player {
         //Play lowest value card in chosen category
         int chosenCardIndex = getLowestValueCardInCategory(chosenCategory);
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
-        stateCard(chosenCategory, chosenCard, "");
+        stateCard(chosenCategory, chosenCard);
         playedCards.addCard(chosenCard);
         return new Object[]{playedCards, chosenCategory};
     }
 
-    public Object[] takeTurn(CardList playedCards, CardList deck, String category, int playerNumber){
+    public Object[] takeTurn(CardList playedCards, CardList deck, String category){
         SupertrumpsCard previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
-        String playerName = "CPU player " + playerNumber;
 
         if (hasPassed){
             System.out.println(playerName + " has passed.");
@@ -101,8 +107,7 @@ public class Player {
 
         if (chosenCard.getType().equals("trump")){
             if (chosenCard.getTitle().equals("The Geologist")){
-                //Include smart logic to choose category
-                System.out.println(playerName + " played a wild trump card");
+                //System.out.println(playerName + " played a wild trump card");
                 String newCategory = pickCardCategory();
 
                 while (newCategory.equals(category)){
@@ -115,7 +120,7 @@ public class Player {
             }
         }
 
-        stateCard(category, chosenCard, playerName);
+        stateCard(category, chosenCard);
         playedCards.addCard(chosenCard);
 
         previouslyPlayedCard = chosenCard;
@@ -125,7 +130,7 @@ public class Player {
             if (myCards.length() != 0){
                 chosenCardIndex = chooseCardToPlay(previouslyPlayedCard,category);
                 chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
-                stateCard(category,chosenCard, playerName);
+                stateCard(category,chosenCard);
                 playedCards.addCard(chosenCard);
 
             }
@@ -149,7 +154,7 @@ public class Player {
                 }
             }
         }else{
-            System.out.println("Previous card was trump");
+            //System.out.println("Previous card was trump");
             for (int i = 0; i < myCards.length(); i++){
                 if (!myCards.getCardAtIndex(i).getType().equals("trump")) {
                     playableCardIndexes.add(i);
@@ -191,12 +196,12 @@ public class Player {
             }
 
             //Replace with smart logic to choose trump card
-            System.out.println("Playing trump");
+            //System.out.println("Playing trump");
             return (int)availableTrumpCards.get(0);
         }
     }
 
-    private void stateCard(String category, SupertrumpsCard card, String playerName){
+    private void stateCard(String category, SupertrumpsCard card){
         System.out.print(playerName + " played card " + card.getTitle() + " ");
         if(category.equals("Economic value")){
             System.out.println("Economic value " + card.getEconomicValue());
@@ -418,11 +423,19 @@ public class Player {
         return categories.get(selectedCategory);
     }
 
+    public void setName(String newName){
+        playerName = "CPU player " + newName;
+    }
+
+    public String getName(){
+        return playerName;
+    }
+
     public Boolean hasCards(){
         if (myCards.length() == 0){
-            return true;
-        }else{
             return false;
+        }else{
+            return true;
         }
     }
 

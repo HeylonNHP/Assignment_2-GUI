@@ -1,5 +1,7 @@
+import java.nio.InvalidMarkException;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -89,7 +91,7 @@ public class HumanPlayer {
         }
 
         if (hasPlayableCard == true){
-            System.out.println("You have playable cards");
+            System.out.println("You have playable cards - Type the number of the card you wish to play or enter -1 to pass.");
         }else {
             setHasPassed(true);
 
@@ -105,12 +107,26 @@ public class HumanPlayer {
         }
 
         //Get card choice
-        int cardChoice = inputDevice.nextInt();
-        Boolean validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
-        while (validChoice == false){
-            System.out.println("Invalid choice");
+        int cardChoice = -1;
+        Boolean validChoice;
+        try {
             cardChoice = inputDevice.nextInt();
             validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
+        }catch (InputMismatchException e){
+            inputDevice.next();
+            validChoice = false;
+        }
+
+        while (validChoice == false){
+            System.out.println("Invalid choice");
+
+            try {
+                cardChoice = inputDevice.nextInt();
+                validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
+            }catch (InputMismatchException e){
+                inputDevice.next();
+                validChoice = false;
+            }
         }
 
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(cardChoice);
@@ -130,16 +146,33 @@ public class HumanPlayer {
         if (chosenCard.getType().equals("trump")) {
             previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
 
+            if (!hasCards()){
+                System.out.println("You have no other cards to play...");
+                return new Object[]{playedCards, deck, category};
+            }
+
             System.out.println("You just played a trump card. Please pick another mineral card to play:");
 
             displayCardList();
 
-            cardChoice = inputDevice.nextInt();
-            validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
-            while (validChoice == false) {
-                System.out.println("Invalid choice");
+            try{
                 cardChoice = inputDevice.nextInt();
                 validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
+            }catch (InputMismatchException e){
+                inputDevice.next();
+                validChoice = false;
+            }
+
+            while (validChoice == false) {
+                System.out.println("Invalid choice");
+
+                try{
+                    cardChoice = inputDevice.nextInt();
+                    validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
+                }catch (InputMismatchException e){
+                    inputDevice.next();
+                    validChoice = false;
+                }
             }
             chosenCard = myCards.takeCardAtIndex(cardChoice);
             stateCard(category, chosenCard);
@@ -323,7 +356,7 @@ public class HumanPlayer {
     }
 
     private void stateCard(String category, SupertrumpsCard card){
-        System.out.print("Played card " + card.getTitle() + " ");
+        System.out.print("You played card " + card.getTitle() + " ");
         if(category.equals("Economic value")){
             System.out.println("Economic value " + card.getEconomicValue());
 
@@ -367,9 +400,9 @@ public class HumanPlayer {
 
     public Boolean hasCards(){
         if (myCards.length() == 0){
-            return true;
-        }else{
             return false;
+        }else{
+            return true;
         }
     }
 
