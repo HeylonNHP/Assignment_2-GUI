@@ -9,6 +9,8 @@ public class Player {
     private Boolean hasPassed = false;
     private String playerName;
 
+    private Boolean hasFinished = false;
+
     String[] cleavage = new String[]{"none","poor/none","1 poor","2 poor","1 good","1 good, 1 poor","2 good","3 good","1 perfect","1 perfect, 1 good","1 perfect, 2 good","2 perfect, 1 good","3 perfect","4 perfect","6 perfect"
     };
     String[] crustalAbundance = new String[]{"ultratrace","trace","low","moderate","high","very high"};
@@ -72,6 +74,7 @@ public class Player {
     }
 
     public Object[] takeTurn(CardList playedCards, CardList deck, String category){
+        System.out.println(deck.length());
         SupertrumpsCard previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
 
         if (hasPassed){
@@ -81,15 +84,20 @@ public class Player {
 
         Boolean hasPlayableCard = false;
         for (int i = 0; i < myCards.length(); i++){
-            if (!myCards.getCardAtIndex(i).getType().equals("trump")){
-                if (cardHasLowerValue(previouslyPlayedCard, myCards.getCardAtIndex(i), category)){
-                    hasPlayableCard = true;
+            if (!playedCards.getCardAtIndex(playedCards.length()-1).getType().equals("trump")){
+                if (!myCards.getCardAtIndex(i).getType().equals("trump")){
+                    if (cardHasLowerValue(previouslyPlayedCard, myCards.getCardAtIndex(i), category)){
+                        hasPlayableCard = true;
+                    }
+                }else{
+                    if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
+                        hasPlayableCard = true;
+                    }
                 }
             }else{
-                if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
-                    hasPlayableCard = true;
-                }
+                hasPlayableCard = true;
             }
+
         }
 
         if (!hasPlayableCard){
@@ -98,6 +106,7 @@ public class Player {
                 myCards.addCard(deck.takeCardAtIndex(deck.length()-1));
             }
             System.out.println(playerName + " doesn't have any playable cards and has passed.");
+            System.out.println(deck.length());
             return new Object[]{playedCards, deck, category};
         }
 
@@ -135,7 +144,7 @@ public class Player {
 
             }
         }
-
+        System.out.println(deck.length());
         return new Object[]{playedCards, deck, category};
     }
 
@@ -203,17 +212,21 @@ public class Player {
 
     private void stateCard(String category, SupertrumpsCard card){
         System.out.print(playerName + " played card " + card.getTitle() + " ");
-        if(category.equals("Economic value")){
-            System.out.println("Economic value " + card.getEconomicValue());
+        if (!card.getType().equals("trump")) {
+            if (category.equals("Economic value")) {
+                System.out.println("Economic value " + card.getEconomicValue());
 
-        }else if(category.equals("Crustal abundance")){
-            System.out.println("Crustal abundance " + card.getCrustalAbundance());
-        }else if(category.equals("Hardness")){
-            System.out.println("Hardness " + card.getHardness());
-        }else if(category.equals("Cleavage")){
-            System.out.println("Cleavage " + card.getCleavage());
-        }else if(category.equals("Specific gravity")){
-            System.out.println("Specific gravity " + card.getSpecificGravity());
+            } else if (category.equals("Crustal abundance")) {
+                System.out.println("Crustal abundance " + card.getCrustalAbundance());
+            } else if (category.equals("Hardness")) {
+                System.out.println("Hardness " + card.getHardness());
+            } else if (category.equals("Cleavage")) {
+                System.out.println("Cleavage " + card.getCleavage());
+            } else if (category.equals("Specific gravity")) {
+                System.out.println("Specific gravity " + card.getSpecificGravity());
+            }
+        }else{
+            System.out.println(card.getSubtitle());
         }
     }
 
@@ -437,6 +450,19 @@ public class Player {
         }else{
             return true;
         }
+    }
+
+    public void setHasFinished(Boolean won){
+        hasFinished = true;
+        if (!won){
+            System.out.println(getName() + " has lost all of their cards.");
+        }else{
+            System.out.println(getName() + " has won the game.");
+        }
+        System.out.println(" The game will continue until there's one loser.");
+    }
+    public Boolean getHasFinished(){
+        return hasFinished;
     }
 
     public Boolean getHasPassed(){

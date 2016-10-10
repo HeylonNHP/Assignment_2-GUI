@@ -1,3 +1,5 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.nio.InvalidMarkException;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
@@ -11,6 +13,7 @@ public class HumanPlayer {
     private CardList myCards = new CardList();
     private Boolean isDealer;
     private Boolean hasPassed = false;
+    private Boolean hasFinished = false;
 
     String[] cleavage = new String[]{"none","poor/none","1 poor","2 poor","1 good","1 good, 1 poor","2 good","3 good","1 perfect","1 perfect, 1 good","1 perfect, 2 good","2 perfect, 1 good","3 perfect","4 perfect","6 perfect"
     };
@@ -79,14 +82,18 @@ public class HumanPlayer {
         //check to see if player has any cards that can be played - if not then skip turn
         Boolean hasPlayableCard = false;
         for (int i = 0; i < myCards.length(); i++){
-            if (!myCards.getCardAtIndex(i).getType().equals("trump")){
-                if (cardHasLowerValue(previouslyPlayedCard, myCards.getCardAtIndex(i), category)){
-                    hasPlayableCard = true;
+            if (!playedCards.getCardAtIndex(playedCards.length()-1).getType().equals("trump")){
+                if (!myCards.getCardAtIndex(i).getType().equals("trump")){
+                    if (cardHasLowerValue(previouslyPlayedCard, myCards.getCardAtIndex(i), category)){
+                        hasPlayableCard = true;
+                    }
+                }else{
+                    if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
+                        hasPlayableCard = true;
+                    }
                 }
             }else{
-                if (!myCards.getCardAtIndex(i).getSubtitle().equals(category)){
-                    hasPlayableCard = true;
-                }
+                hasPlayableCard = true;
             }
         }
 
@@ -129,6 +136,13 @@ public class HumanPlayer {
             }
         }
 
+        if (cardChoice == -1){
+            setHasPassed(true);
+            System.out.println("You have chosen to pass. Press enter to continue.");
+            inputDevice.nextLine();
+            return new Object[]{playedCards, deck, category};
+        }
+
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(cardChoice);
 
         if (chosenCard.getType().equals("trump")){
@@ -151,7 +165,7 @@ public class HumanPlayer {
                 return new Object[]{playedCards, deck, category};
             }
 
-            System.out.println("You just played a trump card. Please pick another mineral card to play:");
+            System.out.println("You just played a trump card. Please pick another mineral card to play (-1 to pass):");
 
             displayCardList();
 
@@ -174,6 +188,14 @@ public class HumanPlayer {
                     validChoice = false;
                 }
             }
+
+            if (cardChoice == -1){
+                setHasPassed(true);
+                System.out.println("You have chosen to pass. Press enter to continue.");
+                inputDevice.nextLine();
+                return new Object[]{playedCards, deck, category};
+            }
+
             chosenCard = myCards.takeCardAtIndex(cardChoice);
             stateCard(category, chosenCard);
             playedCards.addCard(chosenCard);
@@ -183,6 +205,10 @@ public class HumanPlayer {
     }
 
     private Boolean validCardChoice(int cardChoice, SupertrumpsCard previousCard, String category, Boolean allowTrump){
+        if (cardChoice == -1){
+            return true;
+        }
+
         if(cardChoice < 0 || cardChoice > myCards.length()-1){
             System.out.println("Selection out of range!");
             return false;
@@ -357,17 +383,21 @@ public class HumanPlayer {
 
     private void stateCard(String category, SupertrumpsCard card){
         System.out.print("You played card " + card.getTitle() + " ");
-        if(category.equals("Economic value")){
-            System.out.println("Economic value " + card.getEconomicValue());
+        if (!card.getType().equals("trump")) {
+            if (category.equals("Economic value")) {
+                System.out.println("Economic value " + card.getEconomicValue());
 
-        }else if(category.equals("Crustal abundance")){
-            System.out.println("Crustal abundance " + card.getCrustalAbundance());
-        }else if(category.equals("Hardness")){
-            System.out.println("Hardness " + card.getHardness());
-        }else if(category.equals("Cleavage")){
-            System.out.println("Cleavage " + card.getCleavage());
-        }else if(category.equals("Specific gravity")){
-            System.out.println("Specific gravity " + card.getSpecificGravity());
+            } else if (category.equals("Crustal abundance")) {
+                System.out.println("Crustal abundance " + card.getCrustalAbundance());
+            } else if (category.equals("Hardness")) {
+                System.out.println("Hardness " + card.getHardness());
+            } else if (category.equals("Cleavage")) {
+                System.out.println("Cleavage " + card.getCleavage());
+            } else if (category.equals("Specific gravity")) {
+                System.out.println("Specific gravity " + card.getSpecificGravity());
+            }
+        }else{
+            System.out.println(card.getSubtitle());
         }
     }
 
@@ -411,6 +441,18 @@ public class HumanPlayer {
     }
     public void setHasPassed(boolean value){
         hasPassed = value;
+    }
+    public void setHasFinished(Boolean won){
+        hasFinished = true;
+        if (!won){
+            System.out.println("You have lost all of your cards.");
+        }else{
+            System.out.println("You have won the game.");
+        }
+        System.out.println(" The game will continue until there's one loser.");
+    }
+    public Boolean getHasFinished(){
+        return hasFinished;
     }
 
     public String toString(){

@@ -112,6 +112,7 @@ public class MineralSuperTrumpsGame {
 
 
         //Play game
+        Boolean gameFinished = false;
         Boolean gameWon = false;
         CardList playedCards = new CardList();
         int playerPosition = 1;
@@ -138,36 +139,67 @@ public class MineralSuperTrumpsGame {
 
         playerPosition += 1;
 
-        while (gameWon == false){
+        while (gameFinished == false){
             if(playerList.get(playerPosition) instanceof Player){
                 Player currentPlayer = (Player)playerList.get(playerPosition);
+                if (!currentPlayer.getHasFinished()){
+                    Object[] returned = currentPlayer.takeTurn(playedCards, (CardList)playingCards, category);
+                    playedCards = (CardList) returned[0];
+                    playingCards = (CardList) returned[1];
 
-                Object[] returned = currentPlayer.takeTurn(playedCards, playingCards, category);
-                playedCards = (CardList)returned[0];
-                playingCards = (CardList)returned[1];
+                    String previousCategory = category;
+                    category = (String) returned[2];
+                    if (!previousCategory.equals(category)) {
+                        allowAllPlayersToPlayAgain(playerList);
+                    }
 
-                String previousCategory = category;
-                category = (String)returned[2];
-                if (!previousCategory.equals(category)){
-                    allowAllPlayersToPlayAgain(playerList);
+                    if (!currentPlayer.hasCards()){
+                        if (gameWon){
+                            currentPlayer.setHasFinished(false);
+                        }else{
+                            currentPlayer.setHasFinished(true);
+                        }
+                    }
+                    playerList.set(playerPosition,currentPlayer);
                 }
             }else{
                 HumanPlayer currentPlayer = (HumanPlayer)playerList.get(playerPosition);
+                if (!currentPlayer.getHasFinished()){
+                    Object[] returned = currentPlayer.takeTurn(playedCards, (CardList)playingCards, category);
+                    playedCards = (CardList) returned[0];
+                    playingCards = (CardList) returned[1];
 
-                Object[] returned = currentPlayer.takeTurn(playedCards,playingCards,category);
-                playedCards = (CardList)returned[0];
-                playingCards = (CardList)returned[1];
+                    String previousCategory = category;
+                    category = (String) returned[2];
+                    if (!previousCategory.equals(category)) {
+                        allowAllPlayersToPlayAgain(playerList);
+                    }
 
-                String previousCategory = category;
-                category = (String)returned[2];
-                if (!previousCategory.equals(category)){
-                    allowAllPlayersToPlayAgain(playerList);
+                    if (!currentPlayer.hasCards()){
+                        if (gameWon){
+                            currentPlayer.setHasFinished(false);
+                        }else{
+                            currentPlayer.setHasFinished(true);
+                        }
+                    }
+                    playerList.set(playerPosition,currentPlayer);
                 }
             }
-
-            Object[] returned2 = removeWinner(playerList,playerPosition);
+            /*
+            Object[] returned2;
+            if (!gameWon){
+                returned2 = removeWinner(playerList,playerPosition);
+                gameWon = (Boolean)returned2[2];
+            }else{
+                returned2 = removeNonWinners(playerList,playerPosition);
+                gameFinished = (Boolean)returned2[2];
+                if (gameFinished){
+                    break;
+                }
+            }
             playerList = (ArrayList<Object>)returned2[0];
             playerPosition = (int)returned2[1];
+            */
 
             //Check if all but one or less players have passed
             int nonPassedPlayerAmount = playerList.size();
@@ -198,50 +230,96 @@ public class MineralSuperTrumpsGame {
                         Player currentPlayer = (Player)playerList.get(i);
                         if (currentPlayer.getHasPassed()){
                             currentPlayer.setHasPassed(false);
+                            playerList.set(i, currentPlayer);
                         }else{
-                            Object[] returned = currentPlayer.takeInitialTurn(playingCards);
-                            playerPosition = i;
-                            playedCards = (CardList)returned[0];
+                            if (!currentPlayer.getHasFinished()) {
+                                Object[] returned = currentPlayer.takeInitialTurn(playingCards);
+                                playerPosition = i;
+                                playedCards = (CardList) returned[0];
 
-                            String previousCategory = category;
-                            category = (String)returned[1];
-                            if (!previousCategory.equals(category)){
-                                allowAllPlayersToPlayAgain(playerList);
+                                String previousCategory = category;
+                                category = (String) returned[1];
+                                if (!previousCategory.equals(category)) {
+                                    allowAllPlayersToPlayAgain(playerList);
+                                }
+
+                                if (!currentPlayer.hasCards()){
+                                    if (gameWon){
+                                        currentPlayer.setHasFinished(false);
+                                    }else{
+                                        currentPlayer.setHasFinished(true);
+                                    }
+                                }
+
+                                playerList.set(playerPosition, currentPlayer);
                             }
-
-                            playerList.set(playerPosition, currentPlayer);
                         }
                     }else{
                         HumanPlayer currentPlayer = (HumanPlayer)playerList.get(i);
                         if (currentPlayer.getHasPassed()){
                             currentPlayer.setHasPassed(false);
+                            playerList.set(i, currentPlayer);
                         }else{
-                            Object[] returned = currentPlayer.takeInitialTurn(playingCards);
-                            playerPosition = i;
-                            playedCards = (CardList)returned[0];
+                            if (!currentPlayer.getHasFinished()) {
+                                Object[] returned = currentPlayer.takeInitialTurn(playingCards);
+                                playerPosition = i;
+                                playedCards = (CardList) returned[0];
 
-                            String previousCategory = category;
-                            category = (String)returned[1];
-                            if (!previousCategory.equals(category)){
-                                allowAllPlayersToPlayAgain(playerList);
+                                String previousCategory = category;
+                                category = (String) returned[1];
+                                if (!previousCategory.equals(category)) {
+                                    allowAllPlayersToPlayAgain(playerList);
+                                }
+
+                                if (!currentPlayer.hasCards()){
+                                    if (gameWon){
+                                        currentPlayer.setHasFinished(false);
+                                    }else{
+                                        currentPlayer.setHasFinished(true);
+                                    }
+                                }
+
+                                playerList.set(playerPosition, currentPlayer);
                             }
-
-                            playerList.set(playerPosition, currentPlayer);
                         }
                     }
                 }
             }
-
-            returned2 = removeWinner(playerList,playerPosition);
+            /*
+            if (!gameWon){
+                returned2 = removeWinner(playerList,playerPosition);
+                gameWon = (Boolean)returned2[2];
+            }else{
+                returned2 = removeNonWinners(playerList,playerPosition);
+                gameFinished = (Boolean)returned2[2];
+                if (gameFinished){
+                    break;
+                }
+            }
             playerList = (ArrayList<Object>)returned2[0];
             playerPosition = (int)returned2[1];
+            */
+            System.out.println("");
+            for(int i = 0; i < playerList.size(); i++){
+                System.out.println(playerList.get(i).toString());
+            }
+            System.out.println("");
 
+
+            System.out.println("-------------Cards left------------- " + playingCards.length());
             //Execute at end of while block
             if (playerPosition == playerList.size() -1){
                 playerPosition = 0;
             }else{
                 playerPosition += 1;
             }
+        }
+        System.out.println("The game has ended.");
+        if (playerList.get(0) instanceof Player){
+            Player losingPlayer = (Player)playerList.get(0);
+            System.out.println(losingPlayer.getName() + " Lost the game. Haha you suck "+ losingPlayer.getName() +".");
+        }else{
+            System.out.println("You lost. Better luck next time.");
         }
     }
     public static ArrayList<Object> allowAllPlayersToPlayAgain(ArrayList<Object> playerList){
@@ -266,12 +344,14 @@ public class MineralSuperTrumpsGame {
         /*
         If a winner is detected display a message stating the player has won, and remove them from the game
          */
+        Boolean gameWon = false;
         if (playerList.get(currentPosition) instanceof Player){
             Player winner = (Player)playerList.get(currentPosition);
             if (!winner.hasCards()) {
                 System.out.println(winner.getName() + " Has won. The game will continue until there is only one loser.");
                 playerList.remove(currentPosition);
                 currentPosition--;
+                gameWon = true;
             }
         }else{
             HumanPlayer winner = (HumanPlayer)playerList.get(currentPosition);
@@ -279,9 +359,29 @@ public class MineralSuperTrumpsGame {
                 System.out.println("You have won. The game will continue until there is only one loser.");
                 playerList.remove(currentPosition);
                 currentPosition--;
+                gameWon = true;
             }
         }
-        return new Object[]{playerList,currentPosition};
+        return new Object[]{playerList, currentPosition, gameWon};
+    }
+
+    public static Object[] removeNonWinners(ArrayList<Object> playerList, int currentPosition){
+        if (playerList.get(currentPosition) instanceof Player){
+            Player player1 = (Player)playerList.get(currentPosition);
+            System.out.println(player1.getName() + " Lost all their cards. " + player1.getName() + " will be removed from the game.");
+            playerList.remove(currentPosition);
+            currentPosition--;
+        }else{
+            HumanPlayer player1 = (HumanPlayer) playerList.get(currentPosition);
+            System.out.println("You have lost all of your cards. You will be removed from the game.");
+            playerList.remove(currentPosition);
+            currentPosition--;
+        }
+        Boolean gameFinished = false;
+        if (playerList.size() <= 1){
+            gameFinished = true;
+        }
+        return new Object[]{playerList, currentPosition, gameFinished};
     }
 
     public static ArrayList loadCards(String xmlPath){
