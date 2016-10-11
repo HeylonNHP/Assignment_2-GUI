@@ -15,6 +15,10 @@ public class SupertrumpsCard {
         cardAttributes = cardDetails;
     }
 
+    public SupertrumpsCard clone(){
+        return new SupertrumpsCard(cardAttributes);
+    }
+
     public String getType(){
         return cardAttributes.get("card_type");
     }

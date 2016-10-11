@@ -445,11 +445,12 @@ public class HumanPlayer {
     public void setHasFinished(Boolean won){
         hasFinished = true;
         if (!won){
-            System.out.println("You have lost all of your cards.");
+            System.out.print("You have lost all of your cards.");
         }else{
-            System.out.println("You have won the game.");
+            System.out.print("You have won the game.");
         }
         System.out.println(" The game will continue until there's one loser.");
+        setHasPassed(true);
     }
     public Boolean getHasFinished(){
         return hasFinished;

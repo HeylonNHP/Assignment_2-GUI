@@ -157,6 +157,7 @@ public class MineralSuperTrumpsGame {
                         if (gameWon){
                             currentPlayer.setHasFinished(false);
                         }else{
+                            gameWon = true;
                             currentPlayer.setHasFinished(true);
                         }
                     }
@@ -179,6 +180,7 @@ public class MineralSuperTrumpsGame {
                         if (gameWon){
                             currentPlayer.setHasFinished(false);
                         }else{
+                            gameWon = true;
                             currentPlayer.setHasFinished(true);
                         }
                     }
@@ -221,7 +223,68 @@ public class MineralSuperTrumpsGame {
                     }
                 }
             }
+            //NEW
+            if (nonPassedPlayerAmount == 1){
+                System.out.println("Starting new round");
+                for (int i = 0; i < playerList.size(); i++){
+                    if (playerList.get(i) instanceof Player){
+                        Player currentPlayer = (Player)playerList.get(i);
+                        if (!currentPlayer.getHasPassed() && !currentPlayer.getHasFinished()){
 
+                            Object[] returned = currentPlayer.takeInitialTurn(playingCards);
+                            playerPosition = i;
+                            playedCards = (CardList) returned[0];
+
+                            String previousCategory = category;
+                            category = (String) returned[1];
+                            if (!previousCategory.equals(category)) {
+                                allowAllPlayersToPlayAgain(playerList);
+                            }
+
+                            if (!currentPlayer.hasCards()){
+                                if (gameWon){
+                                    currentPlayer.setHasFinished(false);
+                                }else{
+                                    gameWon = true;
+                                    currentPlayer.setHasFinished(true);
+                                }
+                            }
+
+                            playerList.set(i, currentPlayer);
+                            break;
+                        }
+                    }else{
+                        HumanPlayer currentPlayer = (HumanPlayer)playerList.get(i);
+                        if (!currentPlayer.getHasPassed() && !currentPlayer.getHasFinished()){
+
+                            Object[] returned = currentPlayer.takeInitialTurn(playedCards);
+                            playerPosition = i;
+                            playedCards = (CardList) returned[0];
+
+                            String previousCategory = category;
+                            category = (String) returned[1];
+                            if (!previousCategory.equals(category)) {
+                                allowAllPlayersToPlayAgain(playerList);
+                            }
+
+                            if (!currentPlayer.hasCards()){
+                                if (gameWon){
+                                    currentPlayer.setHasFinished(false);
+                                }else{
+                                    gameWon = true;
+                                    currentPlayer.setHasFinished(true);
+                                }
+                            }
+
+                            playerList.set(i, currentPlayer);
+                            break;
+                        }
+                    }
+                }
+                playerList = allowAllPlayersToPlayAgain(playerList);
+            }
+            //OLD
+            /*
             if (nonPassedPlayerAmount <= 1){
                 //Start new round
                 System.out.println("Starting new round");
@@ -285,6 +348,8 @@ public class MineralSuperTrumpsGame {
                     }
                 }
             }
+            */
+
             /*
             if (!gameWon){
                 returned2 = removeWinner(playerList,playerPosition);
@@ -306,7 +371,7 @@ public class MineralSuperTrumpsGame {
             System.out.println("");
 
 
-            System.out.println("-------------Cards left------------- " + playingCards.length());
+            System.out.println("-------------Cards left " + playingCards.length() + " ----- " + playedCards.length());
             //Execute at end of while block
             if (playerPosition == playerList.size() -1){
                 playerPosition = 0;
@@ -329,11 +394,15 @@ public class MineralSuperTrumpsGame {
         for (int i = 0; i < playerList.size(); i++){
             if (playerList.get(i) instanceof Player){
                 Player currentPlayer = (Player)playerList.get(i);
-                currentPlayer.setHasPassed(false);
+                if (!currentPlayer.getHasFinished()) {
+                    currentPlayer.setHasPassed(false);
+                }
                 playerList.set(i, currentPlayer);
             }else{
                 HumanPlayer currentPlayer = (HumanPlayer)playerList.get(i);
-                currentPlayer.setHasPassed(false);
+                if (!currentPlayer.getHasFinished()) {
+                    currentPlayer.setHasPassed(false);
+                }
                 playerList.set(i, currentPlayer);
             }
         }

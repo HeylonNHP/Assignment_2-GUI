@@ -74,7 +74,7 @@ public class Player {
     }
 
     public Object[] takeTurn(CardList playedCards, CardList deck, String category){
-        System.out.println(deck.length());
+        System.out.println("Start " + deck.length());
         SupertrumpsCard previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
 
         if (hasPassed){
@@ -106,13 +106,14 @@ public class Player {
                 myCards.addCard(deck.takeCardAtIndex(deck.length()-1));
             }
             System.out.println(playerName + " doesn't have any playable cards and has passed.");
-            System.out.println(deck.length());
+            System.out.println("Pass " + deck.length());
             return new Object[]{playedCards, deck, category};
         }
 
+        System.out.println("Play card before choice " + deck.length());
         int chosenCardIndex = chooseCardToPlay(previouslyPlayedCard,category);
 
-        SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
+        SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex).clone();
 
         if (chosenCard.getType().equals("trump")){
             if (chosenCard.getTitle().equals("The Geologist")){
@@ -129,22 +130,29 @@ public class Player {
             }
         }
 
+
+
         stateCard(category, chosenCard);
+
+        System.out.println("Play card after take " + deck.length());
+
         playedCards.addCard(chosenCard);
 
         previouslyPlayedCard = chosenCard;
+
+        System.out.println("Play card before second choice " + deck.length());
 
         if (chosenCard.getType().equals("trump")){
             //play a second card
             if (myCards.length() != 0){
                 chosenCardIndex = chooseCardToPlay(previouslyPlayedCard,category);
-                chosenCard = myCards.takeCardAtIndex(chosenCardIndex);
+                chosenCard = myCards.takeCardAtIndex(chosenCardIndex).clone();
                 stateCard(category,chosenCard);
                 playedCards.addCard(chosenCard);
 
             }
         }
-        System.out.println(deck.length());
+        System.out.println("Play card " + deck.length());
         return new Object[]{playedCards, deck, category};
     }
 
@@ -455,11 +463,12 @@ public class Player {
     public void setHasFinished(Boolean won){
         hasFinished = true;
         if (!won){
-            System.out.println(getName() + " has lost all of their cards.");
+            System.out.print(getName() + " has lost all of their cards.");
         }else{
-            System.out.println(getName() + " has won the game.");
+            System.out.print(getName() + " has won the game.");
         }
         System.out.println(" The game will continue until there's one loser.");
+        setHasPassed(true);
     }
     public Boolean getHasFinished(){
         return hasFinished;
