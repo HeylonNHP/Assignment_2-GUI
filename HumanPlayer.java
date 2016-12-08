@@ -117,6 +117,7 @@ public class HumanPlayer {
         int cardChoice = -1;
         Boolean validChoice;
         try {
+            System.out.print(">>> ");
             cardChoice = inputDevice.nextInt();
             validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
         }catch (InputMismatchException e){
@@ -128,6 +129,7 @@ public class HumanPlayer {
             System.out.println("Invalid choice");
 
             try {
+                System.out.print(">>> ");
                 cardChoice = inputDevice.nextInt();
                 validChoice = validCardChoice(cardChoice,previouslyPlayedCard, category, true);
             }catch (InputMismatchException e){
@@ -170,6 +172,7 @@ public class HumanPlayer {
             displayCardList();
 
             try{
+                System.out.print(">>> ");
                 cardChoice = inputDevice.nextInt();
                 validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
             }catch (InputMismatchException e){
@@ -181,6 +184,7 @@ public class HumanPlayer {
                 System.out.println("Invalid choice");
 
                 try{
+                    System.out.print(">>> ");
                     cardChoice = inputDevice.nextInt();
                     validChoice = validCardChoice(cardChoice, previouslyPlayedCard, category, false);
                 }catch (InputMismatchException e){
@@ -244,6 +248,7 @@ public class HumanPlayer {
         Scanner inputDevice = new Scanner(System.in);
         System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
                 "c) Cleavage\ns) Specific gravity");
+        System.out.print(">>> ");
         String newCategory = inputDevice.next();
         switch (newCategory){
             case "e":
@@ -262,6 +267,7 @@ public class HumanPlayer {
         while (true){
             System.out.println("Choose a category: \ne) Economic value\na) Crustal abundance\nh) Hardness\n" +
                     "c) Cleavage\ns) Specific gravity");
+            System.out.print(">>> ");
             newCategory = inputDevice.next();
             switch (newCategory){
                 case "e":

@@ -74,7 +74,6 @@ public class Player {
     }
 
     public Object[] takeTurn(CardList playedCards, CardList deck, String category){
-        System.out.println("Start " + deck.length());
         SupertrumpsCard previouslyPlayedCard = playedCards.getCardAtIndex(playedCards.length()-1);
 
         if (hasPassed){
@@ -106,11 +105,10 @@ public class Player {
                 myCards.addCard(deck.takeCardAtIndex(deck.length()-1));
             }
             System.out.println(playerName + " doesn't have any playable cards and has passed.");
-            System.out.println("Pass " + deck.length());
+
             return new Object[]{playedCards, deck, category};
         }
 
-        System.out.println("Play card before choice " + deck.length());
         int chosenCardIndex = chooseCardToPlay(previouslyPlayedCard,category);
 
         SupertrumpsCard chosenCard = myCards.takeCardAtIndex(chosenCardIndex).clone();
@@ -134,13 +132,9 @@ public class Player {
 
         stateCard(category, chosenCard);
 
-        System.out.println("Play card after take " + deck.length());
-
         playedCards.addCard(chosenCard);
 
         previouslyPlayedCard = chosenCard;
-
-        System.out.println("Play card before second choice " + deck.length());
 
         if (chosenCard.getType().equals("trump")){
             //play a second card
@@ -152,7 +146,6 @@ public class Player {
 
             }
         }
-        System.out.println("Play card " + deck.length());
         return new Object[]{playedCards, deck, category};
     }
 
@@ -481,6 +474,6 @@ public class Player {
         hasPassed = value;
     }
     public String toString(){
-        return "CPU player - is dealer: " + isDealer.toString() + " has " + myCards.length() + " cards";
+        return getName() + " - is dealer: " + isDealer.toString() + " has " + myCards.length() + " cards";
     }
 }
